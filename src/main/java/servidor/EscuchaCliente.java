@@ -111,6 +111,8 @@ public class EscuchaCliente extends Thread {
 					break;
 
 				case Comando.SALIR:
+					//quito los bonus del personaje antes de desconectar para no perder los atributos originales
+					paquetePersonaje.quitarBonus();
 					
 					// Cierro todo
 					entrada.close();

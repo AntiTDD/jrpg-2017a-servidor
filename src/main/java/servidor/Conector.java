@@ -5,9 +5,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import dominio.Item;
 import mensajeria.PaquetePersonaje;
 import mensajeria.PaqueteUsuario;
 
@@ -190,8 +192,7 @@ public class Conector {
 			PreparedStatement stActualizarPersonaje = connect
 					.prepareStatement("UPDATE personaje SET fuerza=?, destreza=?, inteligencia=?, saludTope=?, energiaTope=?, experiencia=?, nivel=? "
 							+ "  WHERE idPersonaje=?");
-			
-			paquetePersonaje.aplicarBonus();//actualizo los atributos de mi personaje con los bonus antes de verlo en pantalla
+		
 			stActualizarPersonaje.setInt(1, paquetePersonaje.getFuerza());
 			stActualizarPersonaje.setInt(2, paquetePersonaje.getDestreza());
 			stActualizarPersonaje.setInt(3, paquetePersonaje.getInteligencia());
@@ -202,6 +203,8 @@ public class Conector {
 			stActualizarPersonaje.setInt(8, paquetePersonaje.getId());
 			
 			stActualizarPersonaje.executeUpdate();
+			
+			//Aca deberia modificar los atributos del personaje, pero no como lo hice ayer porque no abre el juego! 
 			
 			Servidor.log.append("El personaje " + paquetePersonaje.getNombre() + " se ha actualizado con �xito."  + System.lineSeparator());;
 		} catch (SQLException e) {
@@ -224,8 +227,7 @@ public class Conector {
 			int idPersonaje = result.getInt("idPersonaje");
 
 			// Selecciono los datos del personaje
-			PreparedStatement stSeleccionarPersonaje = connect
-					.prepareStatement("SELECT * FROM personaje WHERE idPersonaje = ?");
+			PreparedStatement stSeleccionarPersonaje = connect.prepareStatement("SELECT * FROM personaje WHERE idPersonaje = ?");
 			stSeleccionarPersonaje.setInt(1, idPersonaje);
 			result = stSeleccionarPersonaje.executeQuery();
 
@@ -242,9 +244,11 @@ public class Conector {
 			personaje.setNombre(result.getString("nombre"));
 			personaje.setExperiencia(result.getInt("experiencia"));
 			personaje.setNivel(result.getInt("nivel"));
+			
+			//Cargo el array list de Items del personaje
+			cargarInventario(personaje);			
 
 			// Devuelvo el paquete personaje con sus datos
-			return personaje;
 
 		} catch (SQLException ex) {
 			Servidor.log.append("Fallo al intentar recuperar el personaje " + user.getUsername() + System.lineSeparator());
@@ -253,6 +257,37 @@ public class Conector {
 		}
 
 		return new PaquetePersonaje();
+	}
+	
+	public void cargarInventario (PaquetePersonaje personaje) {
+		ResultSet result = null;
+		ResultSet resultItem = null; 
+		PreparedStatement stItems;
+		PreparedStatement stDatosItem; //Con esta variable hago la consulta a la bd para saber los bonus de cada item en la mochila
+		
+		try {
+			stItems = connect.prepareStatement("SELECT * FROM mochila WHERE idMochila = ?");
+			stItems.setInt(1, personaje.getId());
+			result = stItems.executeQuery();
+			
+			for(int i=1; i<20; i++) {
+				stDatosItem = connect.prepareStatement("SELECT * FROM item WHERE idItem = ?");
+				stDatosItem.setInt(1, result.getInt("item"+i));
+				resultItem = stDatosItem.executeQuery();
+				HashMap<String,Integer> bonus = new HashMap<String,Integer>();
+				bonus.put("bonoAtaque",resultItem.getInt("bonoAtaque"));
+				bonus.put("bonoDefensa", resultItem.getInt("bonoDefensa"));
+				bonus.put("BonoMagia", resultItem.getInt("BonoMagia"));
+				bonus.put("bonoSalud", resultItem.getInt("bonoSalud"));
+				bonus.put("bonoEnergia", resultItem.getInt("bonoEnergia"));
+				
+				Item itemMochila = new Item (resultItem.getInt("idItem"),bonus,new Integer (1));
+				personaje.aniadirItem(itemMochila);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public PaqueteUsuario getUsuario(String usuario) {

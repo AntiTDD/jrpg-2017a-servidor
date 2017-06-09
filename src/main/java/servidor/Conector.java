@@ -273,18 +273,25 @@ public class Conector {
 			stItems.setInt(1, personaje.getId());
 			result = stItems.executeQuery();
 			
-			for(int i=1; i<20; i++) {
+			if(result.wasNull()) {
+				return;
+			}
+			
+			for(int i=1; i<21; i++) {
 				stDatosItem = connect.prepareStatement("SELECT * FROM item WHERE idItem = ?");
-				stDatosItem.setInt(1, result.getInt("item"+i));
-				resultItem = stDatosItem.executeQuery();
-				bonus.put("bonoAtaque",resultItem.getInt("bonoAtaque"));
-				bonus.put("bonoDefensa", resultItem.getInt("bonoDefensa"));
-				bonus.put("BonoMagia", resultItem.getInt("BonoMagia"));
-				bonus.put("bonoSalud", resultItem.getInt("bonoSalud"));
-				bonus.put("bonoEnergia", resultItem.getInt("bonoEnergia"));
-				
-				Item itemMochila = new Item (resultItem.getInt("idItem"),bonus,new Integer (1));
-				personaje.aniadirItem(itemMochila);
+				if(result.getInt("item"+i) != -1) {
+					stDatosItem.setInt(1, result.getInt("item"+i));
+					resultItem = stDatosItem.executeQuery();
+					bonus.put("bonoAtaque",resultItem.getInt("bonoAtaque"));
+					bonus.put("bonoDefensa", resultItem.getInt("bonoDefensa"));
+					bonus.put("BonoMagia", resultItem.getInt("BonoMagia"));
+					bonus.put("bonoSalud", resultItem.getInt("bonoSalud"));
+					bonus.put("bonoEnergia", resultItem.getInt("bonoEnergia"));
+					
+					Item itemMochila = new Item (resultItem.getInt("idItem"),bonus,new Integer (1));
+					personaje.aniadirItem(itemMochila);
+				}
+				stDatosItem.cancel();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

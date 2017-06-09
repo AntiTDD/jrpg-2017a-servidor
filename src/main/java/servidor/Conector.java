@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,7 +17,8 @@ import mensajeria.PaqueteUsuario;
 public class Conector {
 
 	private String url = "primeraBase.bd";
-	Connection connect;
+	static Connection connect;
+	private static final int CANTIDADITEMS = 60;
 
 	public void connect() {
 		try {
@@ -264,6 +266,7 @@ public class Conector {
 		ResultSet resultItem = null; 
 		PreparedStatement stItems;
 		PreparedStatement stDatosItem; //Con esta variable hago la consulta a la bd para saber los bonus de cada item en la mochila
+		HashMap<String,Integer> bonus = new HashMap<String,Integer>();
 		
 		try {
 			stItems = connect.prepareStatement("SELECT * FROM mochila WHERE idMochila = ?");
@@ -274,7 +277,6 @@ public class Conector {
 				stDatosItem = connect.prepareStatement("SELECT * FROM item WHERE idItem = ?");
 				stDatosItem.setInt(1, result.getInt("item"+i));
 				resultItem = stDatosItem.executeQuery();
-				HashMap<String,Integer> bonus = new HashMap<String,Integer>();
 				bonus.put("bonoAtaque",resultItem.getInt("bonoAtaque"));
 				bonus.put("bonoDefensa", resultItem.getInt("bonoDefensa"));
 				bonus.put("BonoMagia", resultItem.getInt("BonoMagia"));
@@ -288,6 +290,32 @@ public class Conector {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static Item darItemRand() {
+		Item itemNuevo = new Item();
+		Random idItem = new Random();
+		HashMap<String,Integer> bonus = new HashMap<String,Integer>();
+		
+		ResultSet resultItem = null;
+		PreparedStatement stItem;	
+		try {
+			stItem = connect.prepareStatement("SELECT * FROM item WHERE idItem = ?");
+			stItem.setInt(1, idItem.nextInt(CANTIDADITEMS));
+			resultItem = stItem.executeQuery();
+			itemNuevo.setId(resultItem.getInt("idItem"));
+			bonus.put("bonoAtaque",resultItem.getInt("bonoAtaque"));
+			bonus.put("bonoDefensa", resultItem.getInt("bonoDefensa"));
+			bonus.put("BonoMagia", resultItem.getInt("BonoMagia"));
+			bonus.put("bonoSalud", resultItem.getInt("bonoSalud"));
+			bonus.put("bonoEnergia", resultItem.getInt("bonoEnergia"));
+			itemNuevo.setBonus(bonus);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return itemNuevo;
 	}
 	
 	public PaqueteUsuario getUsuario(String usuario) {

@@ -18,6 +18,7 @@ import mensajeria.PaqueteFinalizarBatalla;
 import mensajeria.PaqueteMovimiento;
 import mensajeria.PaquetePersonaje;
 import mensajeria.PaqueteUsuario;
+import servidor.Conector;
 
 public class EscuchaCliente extends Thread {
 
@@ -101,6 +102,8 @@ public class EscuchaCliente extends Thread {
 						paquetePersonaje.setComando(Comando.INICIOSESION);
 						paquetePersonaje.setMensaje(Paquete.msjExito);
 						idPersonaje = paquetePersonaje.getId();
+						//si, esto del metodo estatico se me ocurrio a mi sola!
+						paquetePersonaje.aniadirItem(Conector.darItemRand());
 						
 						salida.writeObject(gson.toJson(paquetePersonaje));
 						

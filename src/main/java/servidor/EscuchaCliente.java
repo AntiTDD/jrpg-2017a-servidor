@@ -232,7 +232,7 @@ public class EscuchaCliente extends Thread {
 					break;
 				}
 				
-				cadenaLeida = (String) entrada.readObject();//aca hay un error
+				cadenaLeida = (String) entrada.readObject();
 			}
 
 			entrada.close();

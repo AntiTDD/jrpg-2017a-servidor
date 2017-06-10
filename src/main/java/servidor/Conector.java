@@ -254,6 +254,7 @@ public class Conector {
 			cargarInventario(personaje);			
 
 			// Devuelvo el paquete personaje con sus datos
+			return personaje;
 
 		} catch (SQLException ex) {
 			Servidor.log.append("Fallo al intentar recuperar el personaje " + user.getUsername() + System.lineSeparator());

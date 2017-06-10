@@ -103,8 +103,6 @@ public class EscuchaCliente extends Thread {
 						paquetePersonaje.setMensaje(Paquete.msjExito);
 						idPersonaje = paquetePersonaje.getId();
 						
-						paquetePersonaje.aniadirItem(Conector.darItemRand());
-						
 						salida.writeObject(gson.toJson(paquetePersonaje));
 						
 					} else {

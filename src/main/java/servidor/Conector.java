@@ -205,10 +205,13 @@ public class Conector {
 			stActualizarPersonaje.setInt(8, paquetePersonaje.getId());
 			
 			stActualizarPersonaje.executeUpdate();
-			
-			//Aca deberia modificar los atributos del personaje, pero no como lo hice ayer porque no abre el juego! 
-			
+					
 			Servidor.log.append("El personaje " + paquetePersonaje.getNombre() + " se ha actualizado con �xito."  + System.lineSeparator());;
+			if(paquetePersonaje.getGanoBatalla()){
+				paquetePersonaje.aniadirItem(darItemRand());
+				actualizarInventario(paquetePersonaje);
+			}
+			
 		} catch (SQLException e) {
 			Servidor.log.append("Fallo al intentar actualizar el personaje " + paquetePersonaje.getNombre()  + System.lineSeparator());
 			e.printStackTrace();
@@ -269,8 +272,6 @@ public class Conector {
 		HashMap<String,Integer> bonus = new HashMap<String,Integer>();
 		
 		try {
-			//stItems = connect.prepareStatement("SELECT * FROM mochila WHERE idMochila = ?");
-			//stItems.setInt(1, personaje.getId());
 			stItems = connect.prepareStatement("SELECT * FROM mochila WHERE idMochila = " + personaje.getId());
 			result = stItems.executeQuery();
 			
@@ -292,11 +293,25 @@ public class Conector {
 					}
 					
 					}
-				
-					
-				
 		
 		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void actualizarInventario(PaquetePersonaje paquetePersonaje) {
+		
+		try {
+			PreparedStatement stActualizarInventario = connect.prepareStatement("UPDATE mochila SET item1=?, item2=?, item3=?, item4=?, item5=?, item6=?, item7=?, item8=?, item9=?, item10=?,item11=?, item12=?, item13=?, item14=?, item15=?, item16=?, item17=?, item18=?, item19=?, item20=? "+ "  WHERE idPersonaje=?");
+		
+			for(int i=0; i<paquetePersonaje.getInventario().size(); i++){
+				stActualizarInventario.setInt(1, paquetePersonaje.getInventario().get(i).getId());
+			}
+			stActualizarInventario.executeUpdate();			
+			Servidor.log.append("El inventario de " + paquetePersonaje.getNombre() + " se ha actualizado con �xito."  + System.lineSeparator());;
+		} catch (SQLException e) {
+			Servidor.log.append("Fallo al intentar actualizar el inventario de " + paquetePersonaje.getNombre()  + System.lineSeparator());
 			e.printStackTrace();
 		}
 		

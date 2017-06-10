@@ -310,8 +310,7 @@ public class Conector {
 		ResultSet resultItem = null;
 		PreparedStatement stItem;	
 		try {
-			stItem = connect.prepareStatement("SELECT * FROM item WHERE idItem = ?");
-			stItem.setInt(1, idItem.nextInt(CANTIDADITEMS));
+			stItem = connect.prepareStatement("SELECT * FROM item WHERE idItem ="+idItem.nextInt(CANTIDADITEMS));
 			resultItem = stItem.executeQuery();
 			itemNuevo.setId(resultItem.getInt("idItem"));
 			bonus.put("bonoAtaque",resultItem.getInt("bonoAtaque"));

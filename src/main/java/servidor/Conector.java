@@ -303,12 +303,42 @@ public class Conector {
 	
 	public void actualizarInventario(PaquetePersonaje paquetePersonaje) {
 		
+		int [] idItemsAct = new int [20];
+		int i=0;
+		
 		try {
 			PreparedStatement stActualizarInventario = connect.prepareStatement("UPDATE mochila SET item1=?, item2=?, item3=?, item4=?, item5=?, item6=?, item7=?, item8=?, item9=?, item10=?,item11=?, item12=?, item13=?, item14=?, item15=?, item16=?, item17=?, item18=?, item19=?, item20=? "+ "  WHERE idPersonaje=?");
-		
-			for(int i=0; i<paquetePersonaje.getInventario().size(); i++){
-				stActualizarInventario.setInt(1, paquetePersonaje.getInventario().get(i).getId());
+			while( i < paquetePersonaje.getInventario().size() ){
+				idItemsAct[i] = paquetePersonaje.getInventario().get(i).getId();
+				i++;
 			}
+			if(i<19) {
+				for(i=i; i<20; i++) {
+					idItemsAct[i] = -1;
+				}
+			}
+			
+			stActualizarInventario.setInt(1, idItemsAct[0]);
+			stActualizarInventario.setInt(2, idItemsAct[1]);
+			stActualizarInventario.setInt(3, idItemsAct[2]);
+			stActualizarInventario.setInt(4, idItemsAct[3]);
+			stActualizarInventario.setInt(5, idItemsAct[4]);
+			stActualizarInventario.setInt(6, idItemsAct[5]);
+			stActualizarInventario.setInt(7, idItemsAct[6]);
+			stActualizarInventario.setInt(8, idItemsAct[7]);
+			stActualizarInventario.setInt(9, idItemsAct[8]);
+			stActualizarInventario.setInt(10, idItemsAct[9]);
+			stActualizarInventario.setInt(11, idItemsAct[10]);
+			stActualizarInventario.setInt(12, idItemsAct[11]);
+			stActualizarInventario.setInt(13, idItemsAct[12]);
+			stActualizarInventario.setInt(14, idItemsAct[13]);
+			stActualizarInventario.setInt(15, idItemsAct[14]);
+			stActualizarInventario.setInt(16, idItemsAct[15]);
+			stActualizarInventario.setInt(17, idItemsAct[16]);
+			stActualizarInventario.setInt(18, idItemsAct[17]);
+			stActualizarInventario.setInt(19, idItemsAct[18]);
+			stActualizarInventario.setInt(20, idItemsAct[19]);
+			
 			stActualizarInventario.executeUpdate();			
 			Servidor.log.append("El inventario de " + paquetePersonaje.getNombre() + " se ha actualizado con �xito."  + System.lineSeparator());;
 		} catch (SQLException e) {

@@ -205,12 +205,9 @@ public class Conector {
 			stActualizarPersonaje.setInt(8, paquetePersonaje.getId());
 			
 			stActualizarPersonaje.executeUpdate();
+			this.actualizarInventario(paquetePersonaje);
 					
-			Servidor.log.append("El personaje " + paquetePersonaje.getNombre() + " se ha actualizado con �xito."  + System.lineSeparator());;
-			if(paquetePersonaje.getGanoBatalla()){
-				paquetePersonaje.aniadirItem(darItemRand());
-				actualizarInventario(paquetePersonaje);
-			}
+			Servidor.log.append("El personaje " + paquetePersonaje.getNombre() + " se ha actualizado con �xito."  + System.lineSeparator());
 			
 		} catch (SQLException e) {
 			Servidor.log.append("Fallo al intentar actualizar el personaje " + paquetePersonaje.getNombre()  + System.lineSeparator());
@@ -305,9 +302,8 @@ public class Conector {
 		
 		int [] idItemsAct = new int [20];
 		int i=0;
-		
 		try {
-			PreparedStatement stActualizarInventario = connect.prepareStatement("UPDATE mochila SET item1=?, item2=?, item3=?, item4=?, item5=?, item6=?, item7=?, item8=?, item9=?, item10=?,item11=?, item12=?, item13=?, item14=?, item15=?, item16=?, item17=?, item18=?, item19=?, item20=? "+ "  WHERE idPersonaje=?");
+			PreparedStatement stActualizarInventario = connect.prepareStatement("UPDATE mochila SET item1=?, item2=?, item3=?, item4=?, item5=?, item6=?, item7=?, item8=?, item9=?, item10=?,item11=?, item12=?, item13=?, item14=?, item15=?, item16=?, item17=?, item18=?, item19=?, item20=? "+ "  WHERE idMochila=?");
 			while( i < paquetePersonaje.getInventario().size() ){
 				idItemsAct[i] = paquetePersonaje.getInventario().get(i).getId();
 				i++;
@@ -317,7 +313,6 @@ public class Conector {
 					idItemsAct[i] = -1;
 				}
 			}
-			
 			stActualizarInventario.setInt(1, idItemsAct[0]);
 			stActualizarInventario.setInt(2, idItemsAct[1]);
 			stActualizarInventario.setInt(3, idItemsAct[2]);
@@ -338,6 +333,7 @@ public class Conector {
 			stActualizarInventario.setInt(18, idItemsAct[17]);
 			stActualizarInventario.setInt(19, idItemsAct[18]);
 			stActualizarInventario.setInt(20, idItemsAct[19]);
+			stActualizarInventario.setInt(21, paquetePersonaje.getId());
 			
 			stActualizarInventario.executeUpdate();			
 			Servidor.log.append("El inventario de " + paquetePersonaje.getNombre() + " se ha actualizado con �xito."  + System.lineSeparator());;

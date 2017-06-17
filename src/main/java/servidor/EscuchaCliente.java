@@ -217,6 +217,9 @@ public class EscuchaCliente extends Thread {
 					
 				case Comando.ACTUALIZARPERSONAJE:
 					paquetePersonaje = (PaquetePersonaje) gson.fromJson(cadenaLeida, PaquetePersonaje.class);
+					if(paquetePersonaje.getGanoBatalla()==true) {
+						paquetePersonaje.aniadirItem(Conector.darItemRand());
+					}
 					Servidor.getConector().actualizarPersonaje(paquetePersonaje);
 					
 					Servidor.getPersonajesConectados().remove(paquetePersonaje.getId());

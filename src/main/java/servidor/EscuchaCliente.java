@@ -19,6 +19,7 @@ import mensajeria.PaqueteMovimiento;
 import mensajeria.PaquetePersonaje;
 import mensajeria.PaqueteUsuario;
 import servidor.Conector;
+import comandos.ComandosServer;
 
 public class EscuchaCliente extends Thread {
 
@@ -36,7 +37,8 @@ public class EscuchaCliente extends Thread {
 	
 	private PaqueteDeMovimientos paqueteDeMovimiento;
 	private PaqueteDePersonajes paqueteDePersonajes;
-
+	private PaqueteUsuario paqueteUsuario;
+	
 	public EscuchaCliente(String ip, Socket socket, ObjectInputStream entrada, ObjectOutputStream salida) {
 		this.socket = socket;
 		this.entrada = entrada;
@@ -46,16 +48,17 @@ public class EscuchaCliente extends Thread {
 
 	public void run() {
 		try {
-
+			
+			ComandosServer comand;
 			Paquete paquete;
 			Paquete paqueteSv = new Paquete(null, 0);
-			PaqueteUsuario paqueteUsuario = new PaqueteUsuario();
+			paqueteUsuario = new PaqueteUsuario();
 
 			String cadenaLeida = (String) entrada.readObject();
 		
 			while (!((paquete = gson.fromJson(cadenaLeida, Paquete.class)).getComando() == Comando.DESCONECTAR)){
 								
-				switch (paquete.getComando()) {
+				/*switch (paquete.getComando()) {
 				
 				case Comando.REGISTRO:
 					
@@ -233,19 +236,24 @@ public class EscuchaCliente extends Thread {
 				
 				default:
 					break;
-				}
+				}*/
 				
-				cadenaLeida = (String) entrada.readObject();
-			}
-
+			/*cadenaLeida = (String) entrada.readObject();
 			entrada.close();
 			salida.close();
 			socket.close();
 
 			Servidor.getPersonajesConectados().remove(paquetePersonaje.getId());
 			Servidor.getUbicacionPersonajes().remove(paquetePersonaje.getId());
-			Servidor.getClientesConectados().remove(this);
-
+			Servidor.getClientesConectados().remove(this);*/
+			
+				comand = (ComandosServer) paquete.getObjeto(Comando.NOMBREPAQUETE);
+				comand.setCadena(cadenaLeida);
+				comand.setEscuchaCliente(this);
+				comand.ejecutar();
+				cadenaLeida = (String) entrada.readObject();
+			
+			}
 			for (EscuchaCliente conectado : Servidor.getClientesConectados()) {
 				paqueteDePersonajes = new PaqueteDePersonajes(Servidor.getPersonajesConectados());
 				paqueteDePersonajes.setComando(Comando.CONEXION);
@@ -279,5 +287,74 @@ public class EscuchaCliente extends Thread {
 	public int getIdPersonaje() {
 		return idPersonaje;
 	}
+
+	public PaqueteMovimiento getPaqueteMovimiento() {
+		 return paqueteMovimiento;
+	}
+		 
+	public void setPaqueteMovimiento(PaqueteMovimiento paqueteMovimiento) {
+		this.paqueteMovimiento = paqueteMovimiento;
+	}
+		 
+	public PaqueteBatalla getPaqueteBatalla() {
+		return paqueteBatalla;
+	}
+		 
+	public void setPaqueteBatalla(PaqueteBatalla paqueteBatalla) {
+		this.paqueteBatalla = paqueteBatalla;
+	}
+		 
+	public PaqueteAtacar getPaqueteAtacar() {
+		return paqueteAtacar;
+	}
+		 
+	public void setPaqueteAtacar(PaqueteAtacar paqueteAtacar) {
+		this.paqueteAtacar = paqueteAtacar;
+	}
+		 
+	public PaqueteFinalizarBatalla getPaqueteFinalizarBatalla() {
+		return paqueteFinalizarBatalla;
+	}
+		 
+	public void setPaqueteFinalizarBatalla(PaqueteFinalizarBatalla paqueteFinalizarBatalla) {
+		this.paqueteFinalizarBatalla = paqueteFinalizarBatalla;
+	}
+		 
+	public PaqueteDeMovimientos getPaqueteDeMovimiento() {
+		return paqueteDeMovimiento;
+	}
+		 
+	public void setPaqueteDeMovimiento(PaqueteDeMovimientos paqueteDeMovimiento) {
+		this.paqueteDeMovimiento = paqueteDeMovimiento;
+	}
+		 
+	public PaqueteDePersonajes getPaqueteDePersonajes() {
+		return paqueteDePersonajes;
+	}
+		 
+	public void setPaqueteDePersonajes(PaqueteDePersonajes paqueteDePersonajes) {
+		this.paqueteDePersonajes = paqueteDePersonajes;
+	}
+		
+	public void setIdPersonaje(int idPersonaje) {
+		this.idPersonaje = idPersonaje;
+	}
+		 
+	public void setPaquetePersonaje(PaquetePersonaje paquetePersonaje) {
+		if(paquetePersonaje.getGanoBatalla()==true) {
+			paquetePersonaje.aniadirItem(Conector.darItemRand());
+		}
+		this.paquetePersonaje = paquetePersonaje;
+	}
+		 
+	public PaqueteUsuario getPaqueteUsuario() {
+		return paqueteUsuario;
+	}
+		 
+	public void setPaqueteUsuario(PaqueteUsuario paqueteUsuario) {
+		this.paqueteUsuario = paqueteUsuario;
+	}
+	
+	
 }
 

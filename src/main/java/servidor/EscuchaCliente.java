@@ -247,7 +247,7 @@ public class EscuchaCliente extends Thread {
 			Servidor.getUbicacionPersonajes().remove(paquetePersonaje.getId());
 			Servidor.getClientesConectados().remove(this);*/
 			
-				comand = (ComandosServer) paquete.getObjeto(Comando.NOMBREPAQUETE);
+				comand = (ComandosServer) paquete.getObjeto("comandos");
 				comand.setCadena(cadenaLeida);
 				comand.setEscuchaCliente(this);
 				comand.ejecutar();
